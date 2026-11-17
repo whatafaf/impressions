@@ -67,13 +67,6 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent;border:0;backgroun
 .search{display:flex;align-items:center;gap:4px;max-width:640px;margin:0 auto;padding:0 4px}
 .search .field{flex:1;display:flex;align-items:center;gap:8px;height:48px;border-radius:24px;background:var(--surface-high);padding:0 6px 0 16px}
 .search input{flex:1;border:0;background:none;outline:none;font-size:16px;min-width:0}
-.style{display:flex;max-width:640px;margin:6px auto 0;padding:0 16px}
-.seg{display:flex;border:1px solid var(--outline);border-radius:20px;overflow:hidden;width:100%}
-.seg button{flex:1;height:40px;font-size:14px;font-weight:500;display:flex;align-items:center;justify-content:center;gap:6px;color:var(--on-surface)}
-.seg button+button{border-left:1px solid var(--outline)}
-.seg button[aria-pressed="true"]{background:var(--secondary-container);color:var(--on-secondary-container)}
-.seg button .ms{font-size:18px;display:none}
-.seg button[aria-pressed="true"] .ms{display:inline-block}
 .chips{display:flex;gap:8px;overflow-x:auto;padding:8px 16px 2px;max-width:640px;margin:0 auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .chips::-webkit-scrollbar{display:none}
 .chip{flex:none;height:32px;border-radius:8px;border:1px solid var(--outline-variant);padding:0 12px;font-size:14px;font-weight:500;color:var(--on-surface-variant);display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
@@ -84,19 +77,23 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent;border:0;backgroun
 /* List */
 .wrap{max-width:640px;margin:0 auto;padding:4px 16px calc(110px + env(safe-area-inset-bottom,0px))}
 .count{font-size:13px;color:var(--on-surface-variant);padding:6px 4px 10px}
-.card{background:var(--surface-low);border-radius:16px;padding:14px 8px 4px 16px;margin-bottom:10px}
-.card .head{display:flex;align-items:flex-start;gap:8px;padding-right:8px}
-.card .ref{flex:1;font-weight:600;font-size:17px;color:var(--primary);line-height:1.3;padding-top:2px}
-.card .ph{font-size:12px;color:var(--on-surface-variant);text-align:right;padding-top:4px;line-height:1.3}
-.card .body{padding:6px 8px 2px 0;cursor:pointer}
+.list{background:var(--surface-low);border-radius:16px;overflow:hidden}
+.item{display:flex;align-items:center;gap:12px;padding:12px 16px;width:100%;text-align:left;border-top:1px solid var(--outline-variant)}
+.item:first-child{border-top:0}
+.item:active{background:var(--surface-high)}
+.item .main{flex:1;min-width:0}
+.item .ref{font-size:13px;font-weight:600;color:var(--primary);letter-spacing:.1px}
+.item .title{font-family:var(--serif);font-size:17px;line-height:1.35;margin-top:1px}
+.item .side{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex:none;max-width:38%}
+.item .ph{font-size:12px;color:var(--on-surface-variant);text-align:right;line-height:1.25}
+.item .marks{display:flex;gap:2px;color:var(--on-surface-variant)}
+.item .marks .ms{font-size:16px}
+.item .marks .fav{color:var(--star)}
 .ln{font-family:var(--serif);font-size:17px;line-height:1.55;margin:0 0 8px}
 .ln.and{padding-left:14px;border-left:2px solid var(--outline-variant)}
 .op{color:var(--muted)}
 .br{color:var(--muted)}
-.card .foot{display:flex;align-items:center;gap:2px;margin-left:-8px}
-.card .foot .tag{font-size:12px;color:var(--on-surface-variant);background:var(--surface-high);border-radius:6px;padding:2px 8px;margin-left:4px}
-.card .foot .tag.mine{background:var(--primary-container);color:var(--on-primary-container)}
-.card .foot .sp{flex:1}
+.active{display:flex;gap:8px;flex-wrap:wrap;padding:8px 16px 0;max-width:640px;margin:0 auto}
 .iconbtn.sm{width:40px;height:40px}
 .iconbtn.on{color:var(--star)}
 .iconbtn.used.on{color:var(--good)}
@@ -135,6 +132,8 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent;border:0;backgroun
 .sheet .row small{display:block;color:var(--on-surface-variant);font-size:13px}
 .sheet .row select{background:var(--surface-high);border:0;border-radius:8px;padding:8px}
 .sheet .note{padding:4px 24px 8px;font-size:13px;color:var(--on-surface-variant)}
+.sheet .row .tick{color:var(--primary);visibility:hidden}
+.sheet .row.on .tick{visibility:visible}
 .sheet hr{border:0;border-top:1px solid var(--outline-variant);margin:8px 0}
 
 /* Editor */
@@ -156,9 +155,12 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent;border:0;backgroun
 .reader .rtop{display:flex;align-items:center;padding:calc(6px + env(safe-area-inset-top,0px)) 4px 0}
 .reader .rtop .sp{flex:1}
 .reader .rbody{flex:1;overflow-y:auto;padding:12px 24px 24px;max-width:640px;width:100%;margin:0 auto}
-.reader .rref{font-size:26px;font-weight:600;color:var(--primary);margin:4px 0 2px}
+.reader .rref{font-size:15px;font-weight:600;color:var(--primary);margin:4px 0 4px}
+.reader .rtitle{font-family:var(--serif);font-size:28px;line-height:1.25;margin:0 0 6px}
+.reader .rtags{display:flex;gap:6px;flex-wrap:wrap;margin-top:18px}
+.reader .rtags span{font-size:12px;color:var(--on-surface-variant);background:var(--surface-high);border-radius:6px;padding:2px 8px}
 .reader .rph{font-size:14px;color:var(--on-surface-variant);margin-bottom:22px}
-.reader .ln{font-size:23px;line-height:1.6;margin-bottom:18px}
+.reader .ln{font-size:22px;line-height:1.6;margin-bottom:18px}
 .reader .rused{font-size:13px;color:var(--on-surface-variant);margin-top:8px}
 .reader .rbot{display:flex;align-items:center;justify-content:space-around;padding:8px 8px calc(12px + env(safe-area-inset-bottom,0px));background:var(--surface-container)}
 .reader .rbot .iconbtn{width:56px;height:56px}
@@ -177,6 +179,7 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent;border:0;backgroun
   <div class="bar">
     <h1>Impressions</h1>
     <button class="iconbtn" id="btnSearch" aria-label="Search"><span class="ms">search</span></button>
+    <button class="iconbtn" id="btnFilter" aria-label="Filter"><span class="ms">filter_list</span></button>
     <button class="iconbtn" id="btnRandom" aria-label="Pick one for me"><span class="ms">shuffle</span></button>
     <button class="iconbtn" id="btnSettings" aria-label="Settings"><span class="ms">settings</span></button>
   </div>
@@ -187,23 +190,13 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent;border:0;backgroun
       <button class="iconbtn sm" id="btnClearSearch" aria-label="Close search"><span class="ms">close</span></button>
     </div>
   </div>
-  <div class="style" id="styleRow">
-    <div class="seg" role="group" aria-label="Opening words">
-      <button data-style="a" aria-pressed="false"><span class="ms">check</span>Thank Thee…</button>
-      <button data-style="b" aria-pressed="true"><span class="ms">check</span>We rejoice…</button>
-    </div>
-  </div>
   <div class="chips" id="phaseChips" aria-label="Phase"></div>
-  <div class="chips" id="filterChips" aria-label="Filter">
-    <button class="chip" data-filter="fav" aria-pressed="false"><span class="ms">star</span>Starred</button>
-    <button class="chip" data-filter="used" aria-pressed="false"><span class="ms">history</span>Recently used</button>
-    <button class="chip" data-filter="mine" aria-pressed="false"><span class="ms">person</span>Mine</button>
-  </div>
+  <div class="active hidden" id="activeFilters"></div>
 </header>
 
 <main class="wrap" id="main">
   <div class="count" id="count"></div>
-  <div id="list"></div>
+  <div id="list" class="list"></div>
 </main>
 
 <section class="welcome hidden" id="welcome">
@@ -238,6 +231,15 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent;border:0;backgroun
   <div class="note">Your impressions, stars and history are saved on this phone only. Nothing is sent anywhere. Save a backup now and then in case the phone is lost or reset.</div>
 </div>
 
+<!-- Filter -->
+<div class="sheet" id="filterSheet" role="dialog" aria-label="Filter">
+  <div class="grab"></div>
+  <h3>Show only</h3>
+  <button class="row" data-filter="fav"><span class="ms">star</span><div>Starred</div><span class="ms tick">check</span></button>
+  <button class="row" data-filter="used"><span class="ms">history</span><div>Recently used<small>Most recent first</small></div><span class="ms tick">check</span></button>
+  <button class="row" data-filter="mine"><span class="ms">person</span><div>My own</div><span class="ms tick">check</span></button>
+</div>
+
 <!-- Card actions -->
 <div class="sheet" id="moreSheet" role="dialog" aria-label="Impression actions">
   <div class="grab"></div>
@@ -256,6 +258,8 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent;border:0;backgroun
   <div class="form">
     <label class="lbl" for="edRef">Scripture reference</label>
     <input type="text" id="edRef" placeholder="e.g. John 10:11" autocomplete="off">
+    <label class="lbl" for="edTitle">Short title (shows in the list)</label>
+    <input type="text" id="edTitle" placeholder="e.g. The good Shepherd" autocomplete="off">
     <label class="lbl">Phase (pick one or more)</label>
     <div class="chips" id="edPhases"></div>
     <label class="lbl">What to say</label>
@@ -274,8 +278,7 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent;border:0;backgroun
   <div class="rtop">
     <button class="iconbtn" id="rClose" aria-label="Close"><span class="ms">close</span></button>
     <div class="sp"></div>
-    <button class="iconbtn" id="rStyle" aria-label="Switch opening words"><span class="ms">swap_horiz</span></button>
-    <button class="iconbtn" id="rMore" aria-label="More"><span class="ms">more_vert</span></button>
+        <button class="iconbtn" id="rMore" aria-label="More"><span class="ms">more_vert</span></button>
   </div>
   <div class="rbody" id="rBody"></div>
   <div class="rbot">
@@ -317,7 +320,7 @@ const BOOK_ALIAS = { "psalm": "psalms", "song of solomon": "song of songs", "can
 const BOOK_IX = Object.fromEntries(BOOKS.map((b, i) => [b.toLowerCase(), i]));
 
 /* ---------- State ---------- */
-function blank() { return { items: [], favs: {}, used: {}, removed: {}, style: "b", theme: "system", started: false, lastBackup: null }; }
+function blank() { return { items: [], favs: {}, used: {}, removed: {}, theme: "system", started: false, lastBackup: null }; }
 let S = blank();
 try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(blank(), JSON.parse(raw)); } catch (e) {}
 function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { snack("Could not save on this phone"); } }
@@ -348,7 +351,7 @@ function refKey(ref) {
 function cmpRef(a, b) { const x = refKey(a.ref), y = refKey(b.ref); return x[0] - y[0] || x[1] - y[1] || x[2] - y[2] || a.ref.localeCompare(b.ref); }
 const INLINE_OPENER = /^(We think of one saying|We think of|We thank Thee that|Thank Thee that|Thank Thee for|We rejoice that|We rejoice in|We rejoice to think of|We love to think of|Our hearts rejoice in|We rejoice)\b/i;
 function markBrackets(t) { return esc(t).replace(/\[([^\]]*)\]/g, '<span class="br">[$1]</span>').replace(/\*([^*\s][^*]*)\*/g, "<em>$1</em>"); }
-function opener(line) { if (!line.a) return ""; return S.style === "a" ? line.a : (line.b || line.a); }
+function opener(line) { if (!line.a) return ""; return line.b ? line.a + " / " + line.b : line.a; }
 function lineHTML(line) {
   let op = opener(line), text = line.text || "";
   if (!op) { const m = text.match(INLINE_OPENER); if (m) { op = m[0]; text = text.slice(m[0].length).trimStart(); } }
@@ -361,6 +364,11 @@ function plainText(item) {
     return (op ? op + " " : "") + l.text;
   }).join("\n");
 }
+function titleOf(x) {
+  if (x.title) return x.title;
+  const t = ((x.lines[0] || {}).text || "").replace(INLINE_OPENER, "").replace(/[\[\]]/g, "").trim().split(/\s+/);
+  return t.slice(0, 7).join(" ") + (t.length > 7 ? "…" : "");
+}
 function phaseLabel(item) { return item.phases.map(p => (PHASE[p] || { short: p }).short).join(", "); }
 
 /* ---------- List ---------- */
@@ -372,7 +380,7 @@ function filtered() {
     if (view.mine && x.source !== "mine") return false;
     if (view.used && !lastUsed(x.id)) return false;
     if (words.length) {
-      const hay = (x.ref + " " + x.lines.map(l => (l.a || "") + " " + (l.b || "") + " " + l.text).join(" ") + " " + phaseLabel(x)).toLowerCase();
+      const hay = (x.ref + " " + (x.title || "") + " " + x.lines.map(l => (l.a || "") + " " + (l.b || "") + " " + l.text).join(" ") + " " + phaseLabel(x)).toLowerCase();
       if (!words.every(w => hay.includes(w))) return false;
     }
     return true;
@@ -381,21 +389,15 @@ function filtered() {
   else list.sort(cmpRef);
   return list;
 }
-function cardHTML(x) {
-  const fav = !!S.favs[x.id], lu = lastUsed(x.id), usedToday = lu === today();
-  const tags = [];
-  if (x.source === "mine") tags.push('<span class="tag mine">Mine</span>');
-  else if (x.edited) tags.push('<span class="tag">Edited</span>');
-  if (lu) tags.push(`<span class="tag">Used ${esc(niceDate(lu))}</span>`);
-  return `<article class="card" data-id="${esc(x.id)}">
-    <div class="head"><div class="ref">${esc(x.ref)}</div><div class="ph">${esc(phaseLabel(x))}</div></div>
-    <div class="body" data-open>${x.lines.map(lineHTML).join("")}</div>
-    <div class="foot">
-      <button class="iconbtn sm${fav ? " on" : ""}" data-fav aria-label="${fav ? "Unstar" : "Star"}"><span class="ms${fav ? " fill" : ""}">star</span></button>
-      <button class="iconbtn sm used${usedToday ? " on" : ""}" data-used aria-label="Mark used today"><span class="ms${usedToday ? " fill" : ""}">task_alt</span></button>
-      ${tags.join("")}<span class="sp"></span>
-      <button class="iconbtn sm" data-more aria-label="More"><span class="ms">more_vert</span></button>
-    </div></article>`;
+function rowHTML(x) {
+  const marks = [];
+  if (S.favs[x.id]) marks.push('<span class="ms fill fav">star</span>');
+  if (lastUsed(x.id)) marks.push('<span class="ms">task_alt</span>');
+  if (x.source === "mine") marks.push('<span class="ms">person</span>');
+  return `<button class="item" data-id="${esc(x.id)}">
+    <div class="main"><div class="ref">${esc(x.ref)}</div><div class="title">${esc(titleOf(x))}</div></div>
+    <div class="side"><div class="ph">${esc(phaseLabel(x))}</div>${marks.length ? `<div class="marks">${marks.join("")}</div>` : ""}</div>
+  </button>`;
 }
 function render() {
   document.documentElement.dataset.theme = S.theme === "system" ? "" : S.theme;
@@ -405,12 +407,16 @@ function render() {
   $("#main").classList.toggle("hidden", first);
   $("#top").classList.toggle("hidden", first);
   $("#fab").classList.toggle("hidden", first);
-  document.querySelectorAll("#styleRow button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.style === S.style)));
   // phase chips with counts
   const counts = {}; S.items.forEach(x => x.phases.forEach(p => counts[p] = (counts[p] || 0) + 1));
   $("#phaseChips").innerHTML = [["all", "All", S.items.length], ...PHASES.map(p => [p[0], p[1], counts[p[0]] || 0])]
     .map(([k, label, n]) => `<button class="chip" data-phase="${k}" aria-pressed="${view.phase === k}">${esc(label)} <small>${n}</small></button>`).join("");
-  document.querySelectorAll("#filterChips .chip").forEach(c => c.setAttribute("aria-pressed", String(!!view[c.dataset.filter])));
+  const FL = { fav: "Starred", used: "Recently used", mine: "My own" };
+  const on = Object.keys(FL).filter(k => view[k]);
+  $("#activeFilters").classList.toggle("hidden", !on.length);
+  $("#activeFilters").innerHTML = on.map(k => `<button class="chip" aria-pressed="true" data-off="${k}">${FL[k]}<span class="ms">close</span></button>`).join("");
+  document.querySelectorAll("#filterSheet [data-filter]").forEach(r => r.classList.toggle("on", !!view[r.dataset.filter]));
+  $("#btnFilter").style.color = on.length ? "var(--primary)" : "";
   shown = filtered();
   const ph = view.phase === "all" ? "" : " in " + PHASE[view.phase].long;
   $("#count").textContent = `${shown.length} impression${shown.length === 1 ? "" : "s"}${ph}`;
@@ -418,9 +424,9 @@ function render() {
     const msg = !S.items.length ? "No impressions yet. Tap Add to write your first one, or load the impressions file in Settings."
       : view.phase === "05" && !counts["05"] ? "Nothing here yet for The Spirit. Tap Add to write your own."
       : "Nothing matches. Try another phase or clear the filters.";
-    $("#list").innerHTML = `<div class="empty"><span class="ms">menu_book</span><p>${esc(msg)}</p></div>`;
+    $("#list").classList.remove("list"); $("#list").innerHTML = `<div class="empty"><span class="ms">menu_book</span><p>${esc(msg)}</p></div>`;
   } else {
-    $("#list").innerHTML = shown.map(cardHTML).join("");
+    $("#list").classList.add("list"); $("#list").innerHTML = shown.map(rowHTML).join("");
   }
   if (readerId) renderReader();
 }
@@ -492,9 +498,13 @@ function openReader(id) { readerId = id; renderReader(); if (!$("#reader").class
 function renderReader() {
   const x = byId(readerId); if (!x) { if ($("#reader").classList.contains("open")) closeTop(); return; }
   const lu = lastUsed(x.id), uses = (S.used[x.id] || []).length;
-  $("#rBody").innerHTML = `<div class="rref">${esc(x.ref)}</div><div class="rph">${esc(x.phases.map(p => PHASE[p] ? PHASE[p].long : p).join(", "))}</div>
+  const tags = [];
+  if (x.source === "mine") tags.push("My own"); else if (x.edited) tags.push("Edited");
+  if (lu) tags.push(`Last used ${niceDate(lu)}${uses > 1 ? ` (${uses} times)` : ""}`);
+  $("#rBody").innerHTML = `<div class="rref">${esc(x.ref)}</div><h2 class="rtitle">${esc(titleOf(x))}</h2>
+    <div class="rph">${esc(x.phases.map(p => PHASE[p] ? PHASE[p].long : p).join(", "))}</div>
     ${x.lines.map(lineHTML).join("")}
-    ${lu ? `<div class="rused">Last used ${esc(niceDate(lu))}${uses > 1 ? ` (${uses} times)` : ""}</div>` : ""}`;
+    ${tags.length ? `<div class="rtags">${tags.map(t => `<span>${esc(t)}</span>`).join("")}</div>` : ""}`;
   const fav = !!S.favs[x.id], ut = lu === today();
   $("#rFav").classList.toggle("on", fav); $("#rFav .ms").classList.toggle("fill", fav);
   $("#rUsed").classList.toggle("on", ut); $("#rUsed .ms").classList.toggle("fill", ut);
@@ -508,7 +518,6 @@ $("#rPrev").onclick = () => step(-1);
 $("#rNext").onclick = () => step(1);
 $("#rFav").onclick = () => toggleFav(readerId);
 $("#rUsed").onclick = () => toggleUsed(readerId);
-$("#rStyle").onclick = () => { S.style = S.style === "a" ? "b" : "a"; save(); render(); };
 $("#rMore").onclick = () => openMore(readerId);
 let tx = null;
 $("#rBody").addEventListener("touchstart", e => { tx = e.touches[0].clientX; }, { passive: true });
@@ -560,6 +569,7 @@ function openEditor(id) {
   const x = id ? byId(id) : null;
   $("#editTitle").textContent = x ? "Edit impression" : "New impression";
   $("#edRef").value = x ? x.ref : "";
+  $("#edTitle").value = x && x.title ? x.title : "";
   const phases = new Set(x ? x.phases : (view.phase !== "all" ? [view.phase] : []));
   $("#edPhases").innerHTML = PHASES.map(p => `<button class="chip" data-ph="${p[0]}" aria-pressed="${phases.has(p[0])}">${esc(p[1])}</button>`).join("");
   const lines = x ? x.lines : [{ a: OPENERS[0][0], b: OPENERS[0][1], text: "" }];
@@ -572,7 +582,7 @@ $("#edPhases").addEventListener("click", e => { const c = e.target.closest("[dat
 $("#edAddLine").onclick = () => { const box = $("#edLines"); box.appendChild(lineEditor({ a: OPENERS[0][0], b: OPENERS[0][1], text: "" }, box.children.length)); };
 $("#edCancel").onclick = () => closeTop();
 $("#edSave").onclick = () => {
-  const ref = $("#edRef").value.trim();
+  const ref = $("#edRef").value.trim(), title = $("#edTitle").value.trim();
   const phases = [...document.querySelectorAll("#edPhases [aria-pressed=true]")].map(c => c.dataset.ph);
   const lines = [...document.querySelectorAll("#edLines .lineed")].map((d, i) => {
     const t = $("[data-tx]", d).value.trim().replace(/\s+/g, " "), o = $("[data-op]", d).value;
@@ -584,12 +594,12 @@ $("#edSave").onclick = () => {
   lines[0].and = false;
   if (editingId) {
     const x = byId(editingId);
-    if (x.source !== "mine" && !x.original) x.original = JSON.parse(JSON.stringify({ ref: x.ref, phases: x.phases, lines: x.lines }));
-    Object.assign(x, { ref, phases, lines }); if (x.source !== "mine") x.edited = true;
+    if (x.source !== "mine" && !x.original) x.original = JSON.parse(JSON.stringify({ ref: x.ref, title: x.title, phases: x.phases, lines: x.lines }));
+    Object.assign(x, { ref, title, phases, lines }); if (x.source !== "mine") x.edited = true;
     snack("Saved");
   } else {
     const id = "my" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-    S.items.push({ id, ref, phases, lines, source: "mine", created: today() });
+    S.items.push({ id, ref, title, phases, lines, source: "mine", created: today() });
     S.started = true;
     snack("Added " + ref);
   }
@@ -612,14 +622,14 @@ $("#file").addEventListener("change", async e => {
     let added = 0, updated = 0;
     for (const inc of data.impressions) {
       if (!inc.id || !inc.ref || !Array.isArray(inc.lines) || S.removed[inc.id]) continue;
-      const item = { id: inc.id, ref: inc.ref, phases: inc.phases || [], lines: inc.lines, source: inc.source || "never-stuck" };
+      const item = { id: inc.id, ref: inc.ref, title: inc.title || "", phases: inc.phases || [], lines: inc.lines, source: inc.source || "never-stuck" };
       const cur = byId(inc.id);
       if (!cur) { S.items.push(item); added++; }
-      else if (cur.edited) { cur.original = { ref: item.ref, phases: item.phases, lines: item.lines }; }
+      else if (cur.edited) { cur.original = { ref: item.ref, title: item.title, phases: item.phases, lines: item.lines }; if (!cur.title) { cur.title = item.title; updated++; } }
       else { Object.assign(cur, item); updated++; }
     }
     S.started = true; save(); closeAll(); render();
-    snack(added ? `Loaded ${added} impressions` : `Up to date (${updated} checked)`);
+    snack(added ? `Loaded ${added} impressions` : `Updated ${updated} impressions`);
   } else {
     snack("That is not an impressions or backup file");
   }
@@ -670,16 +680,11 @@ $("#btnRandom").onclick = pickRandom;
 $("#btnSearch").onclick = () => { $("#searchBar").classList.remove("hidden"); $("#q").focus(); };
 $("#btnClearSearch").onclick = () => { $("#q").value = ""; view.q = ""; $("#searchBar").classList.add("hidden"); render(); };
 $("#q").addEventListener("input", e => { view.q = e.target.value; render(); });
-$("#styleRow").addEventListener("click", e => { const b = e.target.closest("[data-style]"); if (b) { S.style = b.dataset.style; save(); render(); } });
 $("#phaseChips").addEventListener("click", e => { const c = e.target.closest("[data-phase]"); if (c) { view.phase = c.dataset.phase; render(); window.scrollTo({ top: 0 }); } });
-$("#filterChips").addEventListener("click", e => { const c = e.target.closest("[data-filter]"); if (c) { view[c.dataset.filter] = !view[c.dataset.filter]; render(); } });
-$("#list").addEventListener("click", e => {
-  const card = e.target.closest(".card"); if (!card) return; const id = card.dataset.id;
-  if (e.target.closest("[data-fav]")) toggleFav(id);
-  else if (e.target.closest("[data-used]")) toggleUsed(id);
-  else if (e.target.closest("[data-more]")) openMore(id);
-  else if (e.target.closest("[data-open]")) openReader(id);
-});
+$("#btnFilter").onclick = () => openLayer($("#filterSheet"));
+$("#filterSheet").addEventListener("click", e => { const r = e.target.closest("[data-filter]"); if (r) { view[r.dataset.filter] = !view[r.dataset.filter]; render(); closeTop(); window.scrollTo({ top: 0 }); } });
+$("#activeFilters").addEventListener("click", e => { const c = e.target.closest("[data-off]"); if (c) { view[c.dataset.off] = false; render(); } });
+$("#list").addEventListener("click", e => { const it = e.target.closest(".item"); if (it) openReader(it.dataset.id); });
 window.addEventListener("scroll", () => $("#top").classList.toggle("scrolled", window.scrollY > 4), { passive: true });
 
 window.LSI = { get state() { return S; }, buildBackup, render };
