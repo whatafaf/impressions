@@ -203,9 +203,10 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent;border:0;backgroun
   <div class="mark"><span class="ms">auto_stories</span></div>
   <h2>Never stuck for words</h2>
   <p>Impressions and scriptures for each part of the Lord's Supper, sorted by phase, with your own added as you go.</p>
-  <p>To start, load the impressions file you saved to Google Drive. It is kept on this phone only and is not part of this website.</p>
+  <p>To start, open the link you were sent, or load an impressions file. Everything is kept on this phone only.</p>
   <div class="stack">
     <button class="btn filled" id="welcomeLoad"><span class="ms">upload_file</span>Load impressions file</button>
+    <button class="btn tonal" id="welcomeLink"><span class="ms">link</span>I have a link</button>
     <button class="btn text" id="welcomeSkip">Start with my own list</button>
   </div>
 </section>
@@ -221,6 +222,7 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent;border:0;backgroun
   <div class="grab"></div>
   <h3>Settings</h3>
   <button class="row" id="setLoad"><span class="ms">upload_file</span><div>Load impressions file<small>Adds new ones and updates the rest. Your edits and your own are kept.</small></div></button>
+  <button class="row" id="setLink"><span class="ms">link</span><div>Load from a link<small>Paste a link someone sent you.</small></div></button>
   <button class="row" id="setBackup"><span class="ms">cloud_upload</span><div>Save backup<small id="backupInfo">Everything, including your own and your stars. Save it to Drive.</small></div></button>
   <button class="row" id="setRestore"><span class="ms">settings_backup_restore</span><div>Restore backup<small>Replaces everything on this phone with the backup.</small></div></button>
   <hr>
@@ -613,6 +615,9 @@ $("#file").addEventListener("change", async e => {
   const f = e.target.files[0]; if (!f) return;
   let data;
   try { data = JSON.parse(await f.text()); } catch (err) { snack("That file could not be read. Pick the .json impressions or backup file."); return; }
+  importData(data);
+});
+function importData(data) {
   if (data && data.type === "backup" && data.state) {
     const n = (data.state.items || []).length;
     if (S.items.length && !confirm(`Replace everything on this phone with this backup from ${data.savedAt ? niceDate(data.savedAt.slice(0, 10)) : "an earlier date"} (${n} impressions)?`)) return;
@@ -633,7 +638,49 @@ $("#file").addEventListener("change", async e => {
   } else {
     snack("That is not an impressions or backup file");
   }
-});
+}
+
+/* ---------- Load from a link ----------
+   A share link is the app address with "#join=<key>". The key unlocks pack.json (encrypted,
+   hosted beside the app). The part after # never leaves the phone, so the host only sees ciphertext. */
+function b64bytes(b64) { b64 = b64.replace(/-/g, "+").replace(/_/g, "/"); while (b64.length % 4) b64 += "="; return Uint8Array.from(atob(b64), c => c.charCodeAt(0)); }
+async function loadFromLink(link) {
+  link = String(link || "").trim(); if (!link) return false;
+  const m = link.match(/#join=([A-Za-z0-9_-]{20,})/);
+  try {
+    let data;
+    if (m) {
+      snack("Loading…");
+      const res = await fetch("pack.json?t=" + Date.now(), { cache: "no-store" });
+      if (!res.ok) throw new Error("fetch");
+      const pack = await res.json();
+      const key = await crypto.subtle.importKey("raw", b64bytes(m[1]), "AES-GCM", false, ["decrypt"]);
+      let plain;
+      try { plain = await crypto.subtle.decrypt({ name: "AES-GCM", iv: b64bytes(pack.iv) }, key, b64bytes(pack.ct)); }
+      catch (e) { snack("That link doesn't work. Check it was copied in full."); return false; }
+      data = JSON.parse(new TextDecoder().decode(plain));
+    } else if (/^https?:\/\//.test(link)) {
+      const res = await fetch(link, { cache: "no-store" });
+      if (!res.ok) throw new Error("fetch");
+      data = await res.json();
+    } else { snack("That doesn't look like a link"); return false; }
+    importData(data); return true;
+  } catch (e) {
+    snack(navigator.onLine === false ? "No internet. Try the link again with signal." : "Couldn't load from that link");
+    return false;
+  }
+}
+function askForLink() {
+  const v = prompt("Paste the link you were sent");
+  if (v) { closeAll(); loadFromLink(v); }
+}
+async function checkJoinLink() {
+  if (!/#join=/.test(location.hash)) return;
+  const link = location.href;
+  history.replaceState(null, "", location.pathname + location.search); // keep the key out of history
+  if (S.items.length && !confirm("Update your impressions from this link? Your stars, history and your own are kept.")) return;
+  await loadFromLink(link);
+}
 function buildBackup() { return { app: "lords-supper-impressions", type: "backup", version: 1, savedAt: new Date().toISOString(), state: S }; }
 async function saveBackup() {
   const name = `impressions-backup-${today()}.json`;
@@ -674,6 +721,8 @@ function snack(text, action, fn) {
 
 /* ---------- Wiring ---------- */
 $("#welcomeLoad").onclick = () => pickFile("load");
+$("#welcomeLink").onclick = askForLink;
+$("#setLink").onclick = askForLink;
 $("#welcomeSkip").onclick = () => { S.started = true; save(); render(); };
 $("#fab").onclick = () => openEditor(null);
 $("#btnRandom").onclick = pickRandom;
@@ -687,8 +736,10 @@ $("#activeFilters").addEventListener("click", e => { const c = e.target.closest(
 $("#list").addEventListener("click", e => { const it = e.target.closest(".item"); if (it) openReader(it.dataset.id); });
 window.addEventListener("scroll", () => $("#top").classList.toggle("scrolled", window.scrollY > 4), { passive: true });
 
-window.LSI = { get state() { return S; }, buildBackup, render };
+window.LSI = { get state() { return S; }, buildBackup, render, loadFromLink };
 render();
+checkJoinLink();
+window.addEventListener("hashchange", checkJoinLink);
 
 if ("serviceWorker" in navigator && location.protocol !== "file:") {
   window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
