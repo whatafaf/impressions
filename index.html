@@ -218,7 +218,7 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent;border:0;backgroun
   <form class="welcome" id="nameForm" autocomplete="on">
     <div class="mark"><span class="ms">waving_hand</span></div>
     <h2 id="ngTitle">Welcome</h2>
-    <p>What's your name? It lets Corban know who is using the app. You'll only be asked once on this phone.</p>
+    <p>What's your name? It's used to keep a count of who is using the app. You'll only be asked once on this phone.</p>
     <input type="text" id="nameInput" name="name" autocomplete="name" maxlength="40" placeholder="Your name" aria-label="Your name" required>
     <div class="stack">
       <button class="btn filled" type="submit">Continue</button>
@@ -245,7 +245,7 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent;border:0;backgroun
     <select id="setTheme"><option value="system">Phone setting</option><option value="light">Light</option><option value="dark">Dark</option></select></label>
   <hr>
   <div class="note" id="stats"></div>
-  <div class="note">Your impressions, stars and history are saved on this phone only. The app lets Corban know your name and when this phone opens it, nothing more. Save a backup now and then in case the phone is lost or reset.</div>
+  <div class="note">Your impressions, stars and history are saved on this phone only. The app sends only your name and when this phone opens it, to keep a count of who is using it. Save a backup now and then in case the phone is lost or reset.</div>
 </div>
 
 <!-- Filter -->
@@ -752,14 +752,14 @@ $("#list").addEventListener("click", e => { const it = e.target.closest(".item")
 window.addEventListener("scroll", () => $("#top").classList.toggle("scrolled", window.scrollY > 4), { passive: true });
 
 /* ---------- Usage count ----------
-   Tells Corban's private Google Sheet who uses the app. Sends only the name typed in once on the
+   Tells a private Google Sheet who uses the app. Sends only the name typed in once on the
    name screen, a random phone ID, the event (open / link / install), home screen yes/no,
    iPhone/Android, and whether impressions are loaded. Never impressions or the share key.
    "open" goes at most once a day. Nothing is sent until a name is entered.
    Opening the app with #nocount turns it off on that phone (and skips the name screen). */
 const STATS_URL = "https://script.google.com/macros/s/AKfycbz-r6Y2_DUhza--UKugAE78r2vUPQ_iEOsEmeJUyVfpLu49NGONf7LMlX-uZtO1X6k3/exec";
 const STATS_KEY = "lsi-stats.v1";
-const APP_VERSION = "2026-11-22b";
+const APP_VERSION = "2026-11-22c";
 function statsGet() { try { return JSON.parse(localStorage.getItem(STATS_KEY)) || {}; } catch (e) { return {}; } }
 function statsSet(st) { try { localStorage.setItem(STATS_KEY, JSON.stringify(st)); } catch (e) {} }
 function ping(ev) {

@@ -1,6 +1,6 @@
 ﻿// Offline support. Bump VERSION whenever app files change so phones pick up the update.
 // The impressions themselves are never in here: they live in the phone's storage only.
-const VERSION = "ls-2026-11-22b";
+const VERSION = "ls-2026-11-22c";
 const SHELL = ["index.html", "manifest.webmanifest", "icons/icon-192.png", "icons/icon-512.png", "icons/maskable-512.png", "icons/apple-touch-icon.png"];
 
 self.addEventListener("install", (e) => {
