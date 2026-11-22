@@ -664,7 +664,7 @@ async function loadFromLink(link) {
       if (!res.ok) throw new Error("fetch");
       data = await res.json();
     } else { snack("That doesn't look like a link"); return false; }
-    importData(data); return true;
+    importData(data); if (m) ping("link"); return true;
   } catch (e) {
     snack(navigator.onLine === false ? "No internet. Try the link again with signal." : "Couldn't load from that link");
     return false;
@@ -736,10 +736,49 @@ $("#activeFilters").addEventListener("click", e => { const c = e.target.closest(
 $("#list").addEventListener("click", e => { const it = e.target.closest(".item"); if (it) openReader(it.dataset.id); });
 window.addEventListener("scroll", () => $("#top").classList.toggle("scrolled", window.scrollY > 4), { passive: true });
 
+/* ---------- Usage count ----------
+   Tells Corban's private Google Sheet how many phones use the app. Sends only a random phone ID,
+   the event (open / link / install), home screen yes/no, iPhone/Android, and whether impressions
+   are loaded. Never names, impressions or the share key. "open" goes at most once a day.
+   Opening the app with #nocount turns it off on that phone. */
+const STATS_URL = "https://script.google.com/macros/s/AKfycbz-r6Y2_DUhza--UKugAE78r2vUPQ_iEOsEmeJUyVfpLu49NGONf7LMlX-uZtO1X6k3/exec";
+const STATS_KEY = "lsi-stats.v1";
+const APP_VERSION = "2026-11-22";
+function statsGet() { try { return JSON.parse(localStorage.getItem(STATS_KEY)) || {}; } catch (e) { return {}; } }
+function statsSet(st) { try { localStorage.setItem(STATS_KEY, JSON.stringify(st)); } catch (e) {} }
+function ping(ev) {
+  try {
+    if (location.hostname !== "whatafaf.github.io") return; // never from tests or local copies
+    const st = statsGet();
+    if (st.off) return;
+    if (!st.id) { st.id = Array.from(crypto.getRandomValues(new Uint8Array(8)), b => b.toString(16).padStart(2, "0")).join(""); statsSet(st); }
+    if (ev === "open" && st.day === today()) return;
+    const ua = navigator.userAgent;
+    const q = new URLSearchParams({
+      d: st.id, e: ev, v: APP_VERSION,
+      s: (matchMedia("(display-mode: standalone)").matches || navigator.standalone === true) ? "1" : "0",
+      p: /iPhone|iPad|iPod/.test(ua) ? "i" : /Android/.test(ua) ? "a" : "o",
+      l: S.items.length ? "1" : "0",
+    });
+    fetch(STATS_URL + "?" + q, { mode: "no-cors", cache: "no-store", keepalive: true, referrerPolicy: "no-referrer" })
+      .then(() => { if (ev === "open") { const s2 = statsGet(); s2.day = today(); statsSet(s2); } })
+      .catch(() => {});
+  } catch (e) {}
+}
+function checkNoCount() {
+  if (location.hash !== "#nocount") return;
+  const st = statsGet(); st.off = true; statsSet(st);
+  history.replaceState(null, "", location.pathname + location.search);
+  snack("This phone won't be counted");
+}
+window.addEventListener("appinstalled", () => ping("install"));
+
 window.LSI = { get state() { return S; }, buildBackup, render, loadFromLink };
 render();
+checkNoCount();
 checkJoinLink();
-window.addEventListener("hashchange", checkJoinLink);
+ping("open");
+window.addEventListener("hashchange", () => { checkNoCount(); checkJoinLink(); });
 
 if ("serviceWorker" in navigator && location.protocol !== "file:") {
   window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
