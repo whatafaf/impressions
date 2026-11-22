@@ -110,6 +110,9 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent;border:0;backgroun
 .welcome .mark .ms{font-size:40px}
 .welcome h2{font-size:26px;font-weight:500;margin:0 0 10px}
 .welcome p{color:var(--on-surface-variant);margin:0 0 14px}
+.namegate{position:fixed;inset:0;z-index:39;background:var(--surface);overflow-y:auto;padding-top:env(safe-area-inset-top,0px)}
+.namegate input{width:100%;height:48px;background:var(--surface-lowest);color:inherit;border:1px solid var(--outline-variant);border-radius:12px;padding:0 14px;font-size:17px;margin-top:6px}
+.namegate input:focus{outline:2px solid var(--primary);outline-offset:-1px}
 .btn{height:44px;border-radius:22px;padding:0 22px;font-weight:500;font-size:15px;display:inline-flex;align-items:center;justify-content:center;gap:8px}
 .btn.filled{background:var(--primary);color:var(--on-primary)}
 .btn.tonal{background:var(--secondary-container);color:var(--on-secondary-container)}
@@ -211,6 +214,18 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent;border:0;backgroun
   </div>
 </section>
 
+<section class="namegate hidden" id="nameGate" role="dialog" aria-labelledby="ngTitle">
+  <form class="welcome" id="nameForm" autocomplete="on">
+    <div class="mark"><span class="ms">waving_hand</span></div>
+    <h2 id="ngTitle">Welcome</h2>
+    <p>What's your name? It lets Corban know who is using the app. You'll only be asked once on this phone.</p>
+    <input type="text" id="nameInput" name="name" autocomplete="name" maxlength="40" placeholder="Your name" aria-label="Your name" required>
+    <div class="stack">
+      <button class="btn filled" type="submit">Continue</button>
+    </div>
+  </form>
+</section>
+
 <button class="fab" id="fab"><span class="ms">add</span>Add</button>
 
 <input type="file" id="file" class="hidden">
@@ -230,7 +245,7 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent;border:0;backgroun
     <select id="setTheme"><option value="system">Phone setting</option><option value="light">Light</option><option value="dark">Dark</option></select></label>
   <hr>
   <div class="note" id="stats"></div>
-  <div class="note">Your impressions, stars and history are saved on this phone only. Nothing is sent anywhere. Save a backup now and then in case the phone is lost or reset.</div>
+  <div class="note">Your impressions, stars and history are saved on this phone only. The app lets Corban know your name and when this phone opens it, nothing more. Save a backup now and then in case the phone is lost or reset.</div>
 </div>
 
 <!-- Filter -->
@@ -737,13 +752,14 @@ $("#list").addEventListener("click", e => { const it = e.target.closest(".item")
 window.addEventListener("scroll", () => $("#top").classList.toggle("scrolled", window.scrollY > 4), { passive: true });
 
 /* ---------- Usage count ----------
-   Tells Corban's private Google Sheet how many phones use the app. Sends only a random phone ID,
-   the event (open / link / install), home screen yes/no, iPhone/Android, and whether impressions
-   are loaded. Never names, impressions or the share key. "open" goes at most once a day.
-   Opening the app with #nocount turns it off on that phone. */
+   Tells Corban's private Google Sheet who uses the app. Sends only the name typed in once on the
+   name screen, a random phone ID, the event (open / link / install), home screen yes/no,
+   iPhone/Android, and whether impressions are loaded. Never impressions or the share key.
+   "open" goes at most once a day. Nothing is sent until a name is entered.
+   Opening the app with #nocount turns it off on that phone (and skips the name screen). */
 const STATS_URL = "https://script.google.com/macros/s/AKfycbz-r6Y2_DUhza--UKugAE78r2vUPQ_iEOsEmeJUyVfpLu49NGONf7LMlX-uZtO1X6k3/exec";
 const STATS_KEY = "lsi-stats.v1";
-const APP_VERSION = "2026-11-22";
+const APP_VERSION = "2026-11-22b";
 function statsGet() { try { return JSON.parse(localStorage.getItem(STATS_KEY)) || {}; } catch (e) { return {}; } }
 function statsSet(st) { try { localStorage.setItem(STATS_KEY, JSON.stringify(st)); } catch (e) {} }
 function ping(ev) {
@@ -751,11 +767,12 @@ function ping(ev) {
     if (location.hostname !== "whatafaf.github.io") return; // never from tests or local copies
     const st = statsGet();
     if (st.off) return;
+    if (!st.name) { if (ev === "link") { st.pendingLink = true; statsSet(st); } return; } // sent once they give a name
     if (!st.id) { st.id = Array.from(crypto.getRandomValues(new Uint8Array(8)), b => b.toString(16).padStart(2, "0")).join(""); statsSet(st); }
     if (ev === "open" && st.day === today()) return;
     const ua = navigator.userAgent;
     const q = new URLSearchParams({
-      d: st.id, e: ev, v: APP_VERSION,
+      d: st.id, e: ev, v: APP_VERSION, n: st.name,
       s: (matchMedia("(display-mode: standalone)").matches || navigator.standalone === true) ? "1" : "0",
       p: /iPhone|iPad|iPod/.test(ua) ? "i" : /Android/.test(ua) ? "a" : "o",
       l: S.items.length ? "1" : "0",
@@ -769,13 +786,32 @@ function checkNoCount() {
   if (location.hash !== "#nocount") return;
   const st = statsGet(); st.off = true; statsSet(st);
   history.replaceState(null, "", location.pathname + location.search);
+  $("#nameGate").classList.add("hidden");
   snack("This phone won't be counted");
 }
+// Name screen: once per phone, live site only, before anything else can be used.
+function needsName() { const st = statsGet(); return location.hostname === "whatafaf.github.io" && !st.off && !st.name; }
+function showNameGate() {
+  if (!needsName()) return;
+  $("#nameGate").classList.remove("hidden");
+  setTimeout(() => $("#nameInput").focus(), 300);
+}
+$("#nameForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const name = $("#nameInput").value.replace(/\s+/g, " ").trim().slice(0, 40);
+  if (!name) { $("#nameInput").focus(); return; }
+  const st = statsGet(); st.name = name; const link = st.pendingLink; delete st.pendingLink; statsSet(st);
+  $("#nameGate").classList.add("hidden");
+  $("#nameInput").blur();
+  ping("open");
+  if (link) setTimeout(() => ping("link"), 1500); // after the first check-in, so the email has the full picture
+});
 window.addEventListener("appinstalled", () => ping("install"));
 
 window.LSI = { get state() { return S; }, buildBackup, render, loadFromLink };
 render();
 checkNoCount();
+showNameGate();
 checkJoinLink();
 ping("open");
 window.addEventListener("hashchange", () => { checkNoCount(); checkJoinLink(); });
